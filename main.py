@@ -3,15 +3,16 @@ import sys, pygame, math
 pygame.init()
 clock = pygame.time.Clock()
 FPS = 60
-VEL = 5
+VEL = 10
 SPEED = 5
 
 size = width, height = 640, 480
 
 screen = pygame.display.set_mode(size)
 speed = [0,0]
+sky = 0, 0, 0
 bg = 50, 50, 100
-grid = 0, 0, 0
+grid = 20, 20, 20
 
 player = pygame.image.load('xwing.png')
 player_rect = player.get_rect()
@@ -32,13 +33,13 @@ def frame_at(distance):
 
     render_position = math.sqrt(math.sqrt(distance/1000))
 
-    rect_left = (render_position * 0.5)
-    rect_top = (render_position * 0.25) + 0.0
-    rect_width = 1 - (rect_left * 2)
-    rect_height = rect_width*1.01
+    rect_left = (render_position * vanishing_point[0])
+    rect_top = (render_position * vanishing_point[1])
+    rect_width = width - (rect_left * 2)
+    rect_height = rect_width * height/width
     
     # pygame.draw.rect(screen, bg, (width * rect_left, height * rect_top, width * rect_width, height * rect_height))
-    pygame.draw.rect(screen, grid, (width * rect_left, height * rect_top, width * rect_width, height * rect_height), 1)
+    pygame.draw.rect(screen, grid, (rect_left, rect_top, rect_width, rect_height), 1)
 
 def draw_grid():
     frame_at((0-distance)%1000)
@@ -57,10 +58,12 @@ def draw_grid():
     # pygame.draw.line(screen, grid, (width*0.95, height), vanishing_point)
     # pygame.draw.line(screen, grid, (width*1, height*.06), vanishing_point)
     # pygame.draw.line(screen, grid, (width*0, height*.06), vanishing_point)
-    pygame.draw.line(screen, grid, (width*0, height), vanishing_point)
-    pygame.draw.line(screen, grid, (width*1, height), vanishing_point)
-    pygame.draw.line(screen, grid, (width*1, height*0), vanishing_point)
-    pygame.draw.line(screen, grid, (width*0, height*0), vanishing_point)
+    pygame.draw.line(screen, grid, (0, height), vanishing_point)
+    pygame.draw.line(screen, grid, (width, height), vanishing_point)
+    pygame.draw.line(screen, grid, (width, 0), vanishing_point)
+    pygame.draw.line(screen, grid, (0, 0), vanishing_point)
+
+    pygame.draw.polygon(screen, sky, [(0,0), (width,0), vanishing_point])
  
 
 while 1:
