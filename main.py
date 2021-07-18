@@ -4,49 +4,63 @@ pygame.init()
 clock = pygame.time.Clock()
 FPS = 60
 VEL = 5
-SPEED = 0.5
+SPEED = 5
 
 size = width, height = 640, 480
 
 screen = pygame.display.set_mode(size)
 speed = [0,0]
-black = 0, 0, 0
-orange = 255, 165, 0
+bg = 50, 50, 100
+grid = 0, 0, 0
 
 player = pygame.image.load('xwing.png')
 player_rect = player.get_rect()
 player_rect.top = height / 2 + player_rect.height/2
 player_rect.left = width / 2 - player_rect.width/2
 
-vanishing_point = (width * .5, height*.4)
+vanishing_point = (width * .5, height*.25)
 
 distance = 0
-frames = [100, 150, 200, 250, 330, 350, 400, 450, 500]
+obstacles = []
 
 # distance = 0-10
 def frame_at(distance):
-    if distance > 60:
+    if distance < -1:
+        return
+    if distance > 1000:
         return
 
-    render_distance = math.sqrt(distance/60)
-    # pygame.draw.rect(screen, black, (width*0.35,height*.3,width*.3,height*.3))
-    # pygame.draw.rect(screen, orange, (width*0.35,height*.3,width*.3,height*.3), 1)
-    # pygame.draw.rect(screen, orange, (width*0.25,height*.235,width*.5,height*.5), 1)
+    render_position = math.sqrt(math.sqrt(distance/1000))
 
-    rect_left = (render_distance * 0.5)
-    rect_top = (render_distance * 0.34) + 0.06
+    rect_left = (render_position * 0.5)
+    rect_top = (render_position * 0.25) + 0.0
     rect_width = 1 - (rect_left * 2)
     rect_height = rect_width*1.01
     
-    # pygame.draw.rect(screen, black, (width * rect_left, height * rect_top, width * rect_width, height * rect_height))
-    pygame.draw.rect(screen, orange, (width * rect_left, height * rect_top, width * rect_width, height * rect_height), 1)
-
+    # pygame.draw.rect(screen, bg, (width * rect_left, height * rect_top, width * rect_width, height * rect_height))
+    pygame.draw.rect(screen, grid, (width * rect_left, height * rect_top, width * rect_width, height * rect_height), 1)
 
 def draw_grid():
-    pygame.draw.line(screen, orange, (width*0.05, height), vanishing_point)
-    pygame.draw.line(screen, orange, (width*0.95, height), vanishing_point)
-    pygame.draw.line(screen, orange, (width*1, height*.06), vanishing_point)
-    pygame.draw.line(screen, orange, (width*0, height*.06), vanishing_point)
+    frame_at((0-distance)%1000)
+    frame_at((100-distance)%1000)
+    frame_at((200-distance)%1000)
+    frame_at((300-distance)%1000)
+    frame_at((400-distance)%1000)
+    frame_at((500-distance)%1000)
+    frame_at((600-distance)%1000)
+    frame_at((700-distance)%1000)
+    frame_at((800-distance)%1000)
+    frame_at((900-distance)%1000)
+    frame_at((1000-distance)%1000) 
+
+    # pygame.draw.line(screen, grid, (width*0.05, height), vanishing_point)
+    # pygame.draw.line(screen, grid, (width*0.95, height), vanishing_point)
+    # pygame.draw.line(screen, grid, (width*1, height*.06), vanishing_point)
+    # pygame.draw.line(screen, grid, (width*0, height*.06), vanishing_point)
+    pygame.draw.line(screen, grid, (width*0, height), vanishing_point)
+    pygame.draw.line(screen, grid, (width*1, height), vanishing_point)
+    pygame.draw.line(screen, grid, (width*1, height*0), vanishing_point)
+    pygame.draw.line(screen, grid, (width*0, height*0), vanishing_point)
  
 
 while 1:
@@ -73,8 +87,6 @@ while 1:
 
     clock.tick(FPS)
     distance += SPEED
-    if distance > 500:
-        distance = 0
 
     player_rect = player_rect.move(speed)
     if player_rect.left < 0 or player_rect.right > width:
@@ -82,12 +94,12 @@ while 1:
     if player_rect.top < 0 or player_rect.bottom > height:
         speed[1] = 0
 
-    screen.fill(black)
+    screen.fill(bg)
     draw_grid()
 
-    for frame in frames:
-        if frame > distance:
-            frame_at(frame - distance)
+    for obstacle in obstacles:
+        if obstacle.distance > distance:
+            frame_at(frame - (distance % 50))
 
     screen.blit(player, player_rect)
     pygame.display.flip()
